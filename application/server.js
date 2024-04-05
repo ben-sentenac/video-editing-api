@@ -29,7 +29,7 @@ app.setErrorHandler(async (err,req,res) => {
     return { error :err.message};
   } 
   if(err.mimeType) {
-    res.code(err.statusCode);
+    res.code(err.statusCode || 415);
     return { error: err.message } ;
   }
   req.log.error({err});
