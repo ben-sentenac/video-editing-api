@@ -5,6 +5,9 @@ import { pipeline } from 'node:stream/promises';
 
 
 import { videoAPIRoutes } from './modules/videos/video.routes.js';
+ 
+
+//TODO clean up file refactoring error handling into is own module
 
 const PORT = 3000;
 const HOST = 'localhost';
@@ -34,7 +37,7 @@ app.setErrorHandler(async (err,req,res) => {
   }
   req.log.error({err});
   res.code(err.statusCode || 500);
-  return 'Error while processing request';
+  return err;
 });
 
 app.setNotFoundHandler(async (req,res) => {
@@ -43,6 +46,16 @@ app.setNotFoundHandler(async (req,res) => {
       status:"error",
       message:"Can't find my way!"
     });
+});
+
+
+process.on('SIGINT', () => {
+  // Perform cleanup before exiting the process
+  console.log('Shutting down ...');
+  // Perform cleanup, if needed
+
+  // Exit the process with a success code
+  process.exit(0);
 });
 
 try {

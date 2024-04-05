@@ -1,7 +1,7 @@
 const utils = {};
 
 utils.ALLOWED_MIME_TYPES = {
-    //'video/quicktime':'mov',
+    'video/quicktime':'mov',
     'video/mp4':'mp4',
     'video/webm':'webm',
     'video/x-ms-wmv':'wmv',
@@ -23,8 +23,8 @@ utils.ALLOWED_MIME_TYPES = {
 };
 
 
-function checkMimeTypes(mimeToCheck) {
-    return utils.ALLOWED_MIME_TYPES.hasOwnProperty(mimeToCheck);
+function checkMimeTypes(mimeToCheck,allowedMimeType) {
+    return allowedMimeType.hasOwnProperty(mimeToCheck);
 }
 
 utils.checkMimeTypes = checkMimeTypes;
