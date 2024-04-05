@@ -1,0 +1,5 @@
+node_modules
+.env
+test-assets
+public
+package.lock.json
