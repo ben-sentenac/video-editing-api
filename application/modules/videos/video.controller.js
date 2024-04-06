@@ -7,8 +7,6 @@ export default class VideoController
 
     constructor() {
         this.services = new VideoServices();
-
-
         this.uploadVideo = this.uploadVideo.bind(this);
     }
 
