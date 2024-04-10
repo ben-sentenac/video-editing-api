@@ -1,9 +1,9 @@
-export default class MimeType extends Error
+export default class BadRequestError extends Error
 {
     constructor(message,statusCode) {
         super(message);
         this.statusCode = statusCode;
-        this.mimeType = true;
+        this.badRequest = true;
         Error.captureStackTrace(this,this.constructor);
     }
 };

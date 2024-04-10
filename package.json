@@ -1,18 +1,21 @@
 {
-  "name": "video-edit-app",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:fastify": "node --watch ./application/server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@fastify/multipart": "^8.2.0",
-    "fastify": "^4.26.2"
-  }
+    "name": "video-edit-app",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "test": "node --test",
+        "dev:fastify": "node --watch ./application/server.js",
+        "purge:storage": "rm -r ./storage/*"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@fastify/env": "^4.3.0",
+        "@fastify/multipart": "^8.2.0",
+        "@fastify/mysql": "^4.2.0",
+        "fastify": "^4.26.2"
+    }
 }

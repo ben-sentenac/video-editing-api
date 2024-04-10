@@ -4,9 +4,8 @@ import VideoController from "./video.controller.js";
 
 export function videoAPIRoutes(instance, _, done) {
 
-    const videoController = new VideoController();
-
-    const { uploadVideo } = videoController;
+    const videoController = new VideoController(instance.mysql);
+    const { uploadVideo, getVideos, convertVideo, downloadVideo } = videoController;
 
     const getAllVideosOptions = {
         method: "GET",
@@ -18,17 +17,13 @@ export function videoAPIRoutes(instance, _, done) {
                     properties: {
                         status: { type: "string" },
                         message: { type: "string" },
+                        data: { type: "array" }
                     },
                     additionalProperties: false,
                 },
             },
         },
-        handler: async (req, res) =>
-            res.send({
-                status: "success",
-                message: "Request successful",
-                extraProperty: "value",
-            }),
+        handler: getVideos
     };
 
     const uploadVideoOptions = {
@@ -48,12 +43,53 @@ export function videoAPIRoutes(instance, _, done) {
                     properties: {
                         status: { type: "string" },
                         message: { type: "string" },
+                        data: {
+                            type: "object",
+                            properties: {
+                                videoId: { type: "string" },
+                                name: { type: "string" },
+                                originalName: { type: "string" },
+                                extension: { type: "string" },
+                                createdAt: { type: "string" },
+                                updatedAt: { type: "string" }
+                            }
+                        }
                     },
-                    additionalProperties: false,
                 },
             },
         },
         handler: uploadVideo,
+    };
+
+
+    const convertVideoOptions = {
+        url: '/convert',
+        method: 'PATCH',
+        schema: {
+            body:{
+                type:"object",
+                properties: {
+                    "videoId":{type:"string"},
+                    "to":{type:"string"}
+                }
+            },
+            response: {
+                "2xx":{
+                    type: "object",
+                    properties: {
+                        status: { type: "string" },
+                        message: { type: "string" },
+                    }
+                }
+            }
+        },
+        handler: convertVideo
+    };
+
+    const downloadVideoOptions = {
+        url:'/download',
+        method:'POST',
+        handler:downloadVideo
     };
 
     /**
@@ -66,4 +102,8 @@ export function videoAPIRoutes(instance, _, done) {
      * @api POST /upload
      */
     instance.route(uploadVideoOptions, done());
+
+    instance.route(convertVideoOptions, done());
+
+    instance.route(downloadVideoOptions,done());
 }

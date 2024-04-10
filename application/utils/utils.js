@@ -22,11 +22,28 @@ utils.ALLOWED_MIME_TYPES = {
      'audio/x-aiff':'aifc',
 };
 
+const mimeTypes = {
+    'flv':'video/x-flv',
+    'mp4':'video/mp4',
+    'm3u8':'application/x-mpegURL',
+    'ts':'video/MP2T',
+    '3gp':'video/3gpp',
+    'mov':'video/quicktime',
+    'avi':'video/x-msvideo',
+    'wmv':'video/x-ms-wmv',
+    'mpeg':'video/mpeg'
+
+};
 
 function checkMimeTypes(mimeToCheck,allowedMimeType) {
     return allowedMimeType.hasOwnProperty(mimeToCheck);
 }
 
+function setMimeType  (ext) {
+    return mimeTypes[ext] ? mimeTypes[ext] : undefined;
+}
+
 utils.checkMimeTypes = checkMimeTypes;
+utils.setMimeType = setMimeType;
 
 export default utils;
