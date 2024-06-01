@@ -1,4 +1,4 @@
-export default class MimeType extends Error
+export default class MimeTypeError extends Error
 {
     constructor(message,statusCode) {
         super(message);

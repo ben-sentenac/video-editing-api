@@ -14,12 +14,9 @@ utils.ALLOWED_MIME_TYPES = {
      'image/svg':'svg',
     'audio/mpeg': 'mp3',
     'audio/x-wav':'wav',
-     'audio/x-wav':'wave',
      'audio/x-flac':'flac',
     'audio/x-ms-wma':'wma' ,
-     'audio/x-aiff':'aiff',
-     'audio/x-aiff':'aif',
-     'audio/x-aiff':'aifc',
+     'audio/x-aiff':'aiff'
 };
 
 const mimeTypes = {
@@ -43,7 +40,12 @@ function setMimeType  (ext) {
     return mimeTypes[ext] ? mimeTypes[ext] : undefined;
 }
 
+ async function fileExists (path) {
+    return !!(await fs.stat(path).catch(e => false));
+}
+
 utils.checkMimeTypes = checkMimeTypes;
 utils.setMimeType = setMimeType;
+utils.fileExists = fileExists;
 
 export default utils;

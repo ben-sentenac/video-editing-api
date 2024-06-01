@@ -24,7 +24,7 @@ export class VideoServices {
      */
     async upload(fileStream, userId) {
         const filename = fileStream.filename;
-
+        
         const ext = path.extname(filename).substring(1).toLocaleLowerCase();
         const originalName = path.parse(filename).name;
 
@@ -97,7 +97,7 @@ export class VideoServices {
     async create(videoId, name, originalName, extension, userId, dimensions) {
         const sql = `INSERT INTO video (video_id,name,original_name,
             extension,user_id,extracted_audio,dimensions,
-            resizes,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)`;
+            resizes,thumbnail,deleted,created_at,updated_at,deleted_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
         const values = [
             videoId,
@@ -108,8 +108,11 @@ export class VideoServices {
             false,
             dimensions,
             JSON.stringify({}),
+            'thumbnail.jpg',
+            false,
             new Date(),
-            new Date()
+            new Date(),
+            null
         ];
 
         return await this.db.execute({
@@ -130,9 +133,10 @@ export class VideoServices {
 
     async getAllVideos() {
         try {
-            const [result, fields] = await this.db.query('SELECT * FROM video');
+            const [result] = await this.db.query('SELECT * FROM video');
             return result;
         } catch (err) {
+            console.error(err);
             throw err;
         }
     }

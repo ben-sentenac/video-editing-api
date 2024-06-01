@@ -67,7 +67,6 @@ export default class FFmpeg {
                 if (code === 0) {
                     //replace empty space by ""
                     dimensions = dimensions.replace(/\s/g, "").split(',');
-                    //console.log(dimensions);
                     resolve({
                         width: Number(dimensions[0]),
                         height: Number(dimensions[1])
@@ -103,7 +102,7 @@ export default class FFmpeg {
                  * storage/videoId/79eeb637d455913f.mp4: No such file or directory\n"
                  * so do not reveal file structure
                  */
-                error += chunk.toString('utf-8');
+                error += chunk.toString('utf-8')
             });
 
             ff.stderr.on('end', () => {

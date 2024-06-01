@@ -1,6 +1,7 @@
 import process from 'node:process';
 import path from 'node:path';
 import { fastifyEnv } from '@fastify/env';
+
 import { fileURLToPath } from 'node:url';
 import { envSchema } from './app.env.schema.js';
 

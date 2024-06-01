@@ -7,6 +7,9 @@ CREATE TABLE videos (
     extracted_audio BOOLEAN,
     dimensions VARCHAR(50),
     resizes JSON,
+    thumbnail VARCHAR(50),
+    deleted BOOLEAN DEFAULT 0,
+    deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
