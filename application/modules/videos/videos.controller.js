@@ -56,7 +56,7 @@ export default class VideoController {
         await this.services.convertVideoTo(videoPath, to);
         //update extension (mabe its better to update all video properties??)
         await this.services.updateExt({ video_id: videoId, extension: to });
-        await this.services.deleteFile(videoPath);
+        await utils.deleteFile(videoPath);
         //get the video
         //convert it
         res.code(200);
@@ -115,7 +115,7 @@ export default class VideoController {
             })
         } finally {
             await file.close();
-            await this.services.deleteFolder(`./storage/${videoId}`);
+            await utils.deleteFolder(`./storage/${videoId}`);
             //delete from db
             await this.services.delete(videoId);
         }
