@@ -1,128 +1,129 @@
-import { spawn } from 'node:child_process';
-import path from 'node:path';
+import { spawn } from "node:child_process";
 
-export default class FFmpeg {
-    /**
-     * make thumnail image from video source
-     * @param {*} input inputPath of the video file the thumbnail is generated from
-     * @param {*} output outputPah of the thumbnail file
-     * @param {*} framePos the timeline frame in second in the video the thumbnail is generted from
-     * @returns 
-     */
-    static generateThumbnail(input, output, framePos) {
-        return new Promise((resolve, reject) => {
-            const _framePos = String(framePos);
-            const ff = spawn(
-                "ffmpeg", [
-                "-i",
-                input,
-                "-ss",
-                "5",
-                "-vframes",
-                "1",
-                output,
-            ]);
-            //lidsten on error and close event
-            ff.on('close', (code) => {
-                if (code === 0) {
-                    resolve(true);
-                } else {
-                    reject(false);
-                }
+export const FF = {};
 
-            });
-            ff.on('error', (err) => {
-                console.error(err);
-                reject(err);
-            });
+//ffmpeg -i video.mp4 -ss 5 -vframes 1 thumbnail.jpg
+FF.makeThumbnail = (inputPath, outputPath) => {
+    return new Promise((resolve, reject) => {
+        const ffmpeg = spawn("ffmpeg", [
+            "-i",
+            inputPath,
+            "-ss",
+            "5",
+            "-vframes",
+            "1",
+            outputPath,
+        ]);
+
+        ffmpeg.on('close', (code) => {
+            if (code === 0) {
+                resolve();
+            } else {
+                reject(`FFmpeg exit with code: ${code}`);
+            }
+
         });
 
-    }
+        ffmpeg.on('error', (error) => {
+            reject(error);
+        })
+    });
+}
+//ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0
+//inputPath
+FF.getDimensions = (inputPath) => {
+    return new Promise((resolve, reject) => {
+        const ffprobe = spawn("ffprobe", [
+            "-v",
+            "error",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=width,height",
+            "-of",
+            "csv=p=0",
+            inputPath,
+        ]);
 
-    static getVideoDimension(videoPath) {
-        return new Promise((resolve, reject) => {
-            const ffprobe = spawn("ffprobe", [
-                "-v",
-                "error",
-                "-select_streams",
-                "v:0",
-                "-show_entries",
-                "stream=width,height",
-                "-of",
-                "csv=p=0",
-                videoPath,
-            ]);
-            let error = '';
-            let dimensions = "";
-    
-            ffprobe.stdout.on('data', (chunk) => {
-                dimensions += chunk.toString("utf-8");
-            });
+        let dimensions = "";
 
-            ffprobe.stderr.on('data',(chunk) => {
-                error += chunk.toString('utf-8');
-            });
-    
-            ffprobe.on('close', (code) => {
-                if (code === 0) {
-                    //replace empty space by ""
-                    dimensions = dimensions.replace(/\s/g, "").split(',');
-                    resolve({
-                        width: Number(dimensions[0]),
-                        height: Number(dimensions[1])
-                    });
-                } else {
-                    reject({error});
-                }
-            });
-    
-            ffprobe.on('error', (err) => {
-                reject(err);
-            });
+        ffprobe.stdout.on('data', (chunk) => {
+            dimensions += chunk.toString("utf-8");
         });
-    }
 
-    static convertTo(input,format) {
-        return new Promise ((resolve,reject) => {
-            const output = input.replace(path.extname(input),'') + `.${format}`;
-            let error = '';
-            const ff = spawn('ffmpeg',[
-                "-loglevel",
-                "error",
-                "-i",
-                input,
-                output
-            ]);
-
-            ff.stderr.on('data',(chunk) => {
-                //TODO don't do this for security issues 
-                /**
-                 * if wrong input or output 
-                 * "/home/benfrom09/WORKSPACE/NODE_JS/apps_and_api/video-edit-app/
-                 * storage/videoId/79eeb637d455913f.mp4: No such file or directory\n"
-                 * so do not reveal file structure
-                 */
-                error += chunk.toString('utf-8')
-            });
-
-            ff.stderr.on('end', () => {
-                console.log(error);
-                const message = error.split(':');
-                error = (`${path.basename(message[0])}:${message[1]}`).replace('\n','.');
-            });
-
-            ff.on("close", (code) => {
-                if(code === 0) {
-                    resolve();
-                } else {
-                    reject({error});
-                }
-            })
-
-            ff.on("error", (err) => {
-                console.error('ERROR',err);
-                reject(err);
-            });
+        ffprobe.on('close', (code) => {
+            if (code === 0) {
+                //replace empty space by ""
+                dimensions = dimensions.replace(/\s/g, "").split(',');
+                //console.log(dimensions);
+                resolve({
+                    width: Number(dimensions[0]),
+                    height: Number(dimensions[1])
+                });
+            } else {
+                reject(`FFprobe exited with code ${code}`);
+            }
         });
-    }
+
+        ffprobe.on('error', (error) => {
+            reject(error);
+        });
+    });
+
+};
+
+//ffmpeg -i <videopath> -vn -c:a copy <audio.aac>
+FF.extractAudio = (originalVideoPath, targetAudioPath) => {
+    return new Promise((resolve, reject) => {
+
+        const ffmpeg = spawn('ffmpeg', ['-i', originalVideoPath, '-vn', '-c:a', 'copy', targetAudioPath]);
+        ffmpeg.on('close', (code) => {
+            if (code === 0) {
+                resolve();
+            } else {
+                reject(`FFmpeg exited with code:${code}`);
+            }
+        });
+
+        ffmpeg.on('error', (err) => {
+            reject(err);
+        });
+        //end promisez
+    });
+};
+
+//ffmpeg -i video.mp4 -vf scale=320:140 -c:a copy -y video-320x140.mp4
+FF.resize = (originalVideoPath, targetVideoPath, width, height) => {
+    return new Promise((resolve, reject) => {
+        //nice (see ressource manangement because we don't want ffmpeg take all resoutrces)
+        //and let node have the priority
+        //ps -p <processid> -o nice 
+        //the lowest number (nice value) have the highest priority
+        // so node must have the highest priority
+        //todo research "set nice value linux"
+        const ffmpeg = spawn('ffmpeg', [
+            '-i',
+            originalVideoPath,
+            '-vf',
+            `scale=${width}x${height}`,
+            '-c:a',
+            'copy',
+            '-threads',//run using only 2 cores
+            '2',//
+            '-y',
+            targetVideoPath
+        ]);
+
+        ffmpeg.on('close', (code) => {
+            if (code === 0) {
+                resolve();
+            } else {
+                reject(`FFmpeg exited with code:${code}`);
+            }
+        })
+
+        ffmpeg.on('error', (err) => {
+            reject(err);
+        });
+    });
 }

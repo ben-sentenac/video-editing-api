@@ -1,3 +1,5 @@
+import { readdir } from 'node:fs';
+import fs from 'node:fs/promises';
 const utils = {};
 
 utils.ALLOWED_MIME_TYPES = {
@@ -44,8 +46,31 @@ function setMimeType  (ext) {
     return !!(await fs.stat(path).catch(e => false));
 }
 
+//APP stuff
+async function deleteFolder(path) {
+    try {
+        await fs.rm(path, { recursive: true });
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
+
+}
+
+async function deleteFile(filePath) {
+    try {
+        await fs.unlink(filePath);
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
+}
+
+
 utils.checkMimeTypes = checkMimeTypes;
 utils.setMimeType = setMimeType;
 utils.fileExists = fileExists;
+utils.deleteFile = deleteFile;
+utils.deleteFolder = deleteFolder;
 
 export default utils;

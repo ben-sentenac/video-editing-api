@@ -6,7 +6,7 @@
     "type": "module",
     "scripts": {
         "test": "node --test",
-        "dev:fastify": "node --watch ./application/server.js",
+        "dev:fastify": "node --watch ./application/index.js",
         "purge:storage": "rm -r ./storage/*"
     },
     "keywords": [],
@@ -18,6 +18,10 @@
         "@fastify/multipart": "^8.2.0",
         "@fastify/mysql": "^4.2.0",
         "@fastify/static": "^7.0.3",
-        "fastify": "^4.26.2"
+        "fastify": "^4.26.2",
+        "uuid": "^9.0.1"
+    },
+    "devDependencies": {
+        "form-auto-content": "^3.2.1"
     }
 }
